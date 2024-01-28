@@ -38,12 +38,17 @@ public class UrlMappingController {
     @GetMapping("/{shortKey}")
     public void redirectToOriginalUrl(@PathVariable String shortKey, HttpServletResponse response) throws IOException {
         try {
-            String originalUrl = urlMappingService.findOriginalUrlByShortKey(shortKey);
-            // If the original URL is found, redirect to it
-            if (originalUrl != null) {
-                response.sendRedirect(originalUrl);
-                return;
+            String originalUrl = null;
+            originalUrl = urlMappingService.findOriginalUrlByShortKey(shortKey);
+            if(originalUrl == null) {
+                // If the original URL is not found, you might want to redirect to a default page or show an error
+                response.sendRedirect("/defaultPage");
             }
+            // If the original URL is found, async increment "hit" counter and redirect to it
+            // kafka.incrementHitCounter(originalUrl);
+
+            response.sendRedirect(originalUrl);
+            return;
         } catch (Exception e) {
             // Handle exceptions if necessary
         }
